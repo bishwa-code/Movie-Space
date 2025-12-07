@@ -77,6 +77,11 @@ const App = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // Scroll to top on view change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [view, selectedMovieId]);
+
   // --- Handlers ---
 
   const loadHomeData = async () => {
@@ -183,11 +188,11 @@ const App = () => {
   const renderSection = (title: string, movies: Movie[]) => {
     if (!movies || movies.length === 0) return null;
     return (
-      <section className="mb-12 animate-slide-up">
-        <h2 className="text-2xl font-bold text-white mb-6 px-4 md:px-8 border-l-4 border-neon-blue">{title}</h2>
+      <section className="mb-12 animate-slide-up relative z-10">
+        <h2 className="text-xl md:text-2xl font-bold text-white mb-6 px-4 md:px-8 border-l-4 border-neon-blue">{title}</h2>
         <div className="overflow-x-auto hide-scrollbar pb-8 px-4 md:px-8 flex gap-4 snap-x">
           {movies.map(movie => (
-            <div key={movie.id} className="min-w-[160px] md:min-w-[200px] snap-start">
+            <div key={movie.id} className="min-w-[150px] md:min-w-[200px] snap-start">
               <MovieCard 
                 movie={movie} 
                 onClick={openMovieDetails} 
@@ -203,27 +208,27 @@ const App = () => {
 
   const renderHero = () => {
     if (!featuredMovie) return (
-      <div className="h-[70vh] w-full bg-space-dark animate-pulse mb-12 flex items-center justify-center">
+      <div className="h-[60vh] w-full bg-space-dark animate-pulse mb-12 flex items-center justify-center">
          <div className="w-16 h-16 border-4 border-neon-blue/30 border-t-neon-blue rounded-full animate-spin"></div>
       </div>
     );
     
     return (
-      <div className="relative h-[70vh] w-full mb-12 group">
+      <div className="relative h-[65vh] md:h-[80vh] w-full mb-12 group overflow-hidden">
         <div className="absolute inset-0">
           <img 
             src={getImageUrl(featuredMovie.backdrop_path, 'original')} 
             alt={featuredMovie.title}
-            className="w-full h-full object-cover transition-transform duration-10000"
+            className="w-full h-full object-cover transition-transform duration-[20s] group-hover:scale-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-space-black via-space-black/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-space-black via-space-black/40 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-space-black via-transparent to-transparent" />
         </div>
-        <div className="absolute bottom-0 left-0 p-8 md:p-16 max-w-3xl animate-slide-up">
-          <span className="bg-neon-blue text-space-black font-bold px-3 py-1 rounded-full text-sm mb-4 inline-block shadow-lg shadow-neon-blue/20">Trending #1</span>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight drop-shadow-lg">{featuredMovie.title}</h1>
-          <p className="text-slate-300 text-lg mb-8 line-clamp-3 md:line-clamp-2 drop-shadow-md">{featuredMovie.overview}</p>
-          <div className="flex gap-4">
+        <div className="absolute bottom-0 left-0 p-6 md:p-16 w-full max-w-4xl animate-slide-up z-10">
+          <span className="bg-neon-blue text-space-black font-bold px-3 py-1 rounded-full text-xs md:text-sm mb-4 inline-block shadow-lg shadow-neon-blue/20">Trending #1</span>
+          <h1 className="text-3xl md:text-6xl font-bold text-white mb-4 leading-tight drop-shadow-2xl">{featuredMovie.title}</h1>
+          <p className="text-slate-200 text-sm md:text-lg mb-8 line-clamp-3 md:line-clamp-2 drop-shadow-md max-w-2xl">{featuredMovie.overview}</p>
+          <div className="flex flex-wrap gap-4">
             <button 
               onClick={() => openMovieDetails(featuredMovie.id)}
               className="bg-neon-blue text-space-black font-bold py-3 px-8 rounded-xl hover:bg-white transition-all hover:scale-105 hover:shadow-lg hover:shadow-neon-blue/20 flex items-center gap-2"
@@ -244,48 +249,52 @@ const App = () => {
 
   const renderDetails = () => {
     if (detailsLoading || !movieDetails) return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-space-black">
             <div className="w-16 h-16 border-4 border-neon-blue/30 border-t-neon-blue rounded-full animate-spin mb-4"></div>
             <p className="text-slate-400 animate-pulse">Retrieving Movie Data...</p>
         </div>
     );
 
     return (
-      <div className="animate-fade-in pb-20">
-        {/* Banner */}
-        <div className="relative h-[50vh] md:h-[60vh]">
+      <div className="animate-fade-in bg-space-black min-h-screen">
+        {/* Banner - Adjusted heights to be less dominant on mobile, impactful on desktop */}
+        <div className="relative h-[40vh] md:h-[50vh] lg:h-[60vh] w-full overflow-hidden">
           <img 
             src={getImageUrl(movieDetails.backdrop_path, 'original')} 
             className="w-full h-full object-cover"
             alt="backdrop"
           />
-          <div className="absolute inset-0 bg-space-black/60 backdrop-blur-[2px]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-space-black to-transparent" />
+          <div className="absolute inset-0 bg-space-black/40 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-space-black via-space-black/60 to-transparent" />
           
-          <button onClick={() => setView('home')} className="absolute top-8 left-8 p-3 glass-panel rounded-full hover:bg-white/20 transition-all z-10 hover:rotate-90">
-             <ICONS.X />
+          <button onClick={() => setView('home')} className="absolute top-20 left-4 md:top-24 md:left-8 p-3 glass-panel rounded-full hover:bg-white/20 transition-all z-20 group">
+             <ICONS.X className="group-hover:rotate-90 transition-transform duration-300" />
           </button>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 -mt-32 relative z-10">
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* Poster */}
-            <div className="w-64 md:w-80 flex-shrink-0 rounded-xl overflow-hidden shadow-2xl shadow-neon-blue/20 mx-auto md:mx-0 border border-white/10">
-              <img src={getImageUrl(movieDetails.poster_path)} className="w-full h-auto" alt={movieDetails.title} />
+        {/* Content Container - Fixed layout, overlapping, and responsive behaviors */}
+        <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10 -mt-24 md:-mt-32 lg:-mt-40 pb-20">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+            
+            {/* Poster - Constrained width, prevents stretching */}
+            <div className="w-48 md:w-64 lg:w-80 flex-shrink-0 rounded-xl overflow-hidden shadow-2xl shadow-neon-blue/10 mx-auto lg:mx-0 border border-white/10 bg-space-dark">
+              <img src={getImageUrl(movieDetails.poster_path)} className="w-full h-auto object-cover" alt={movieDetails.title} />
             </div>
 
-            {/* Info */}
-            <div className="flex-1 pt-4 md:pt-12 text-center md:text-left">
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{movieDetails.title}</h1>
-              <div className="flex flex-wrap justify-center md:justify-start gap-4 text-slate-400 mb-6 text-sm">
+            {/* Info Section - min-w-0 prevents flex child from overflowing parent */}
+            <div className="flex-1 min-w-0 pt-4 lg:pt-24 text-center lg:text-left w-full">
+              <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 leading-tight">{movieDetails.title}</h1>
+              {movieDetails.tagline && <p className="text-neon-blue italic mb-4 opacity-80">{movieDetails.tagline}</p>}
+              
+              <div className="flex flex-wrap justify-center lg:justify-start gap-3 md:gap-6 text-slate-300 mb-6 text-sm font-medium">
                 <span>{movieDetails.release_date.split('-')[0]}</span>
-                <span>•</span>
+                <span className="hidden md:inline">•</span>
                 <span>{movieDetails.runtime} min</span>
-                <span>•</span>
-                <span className="flex items-center gap-1 text-yellow-400"><ICONS.Star size={14} /> {movieDetails.vote_average.toFixed(1)}</span>
+                <span className="hidden md:inline">•</span>
+                <span className="flex items-center gap-1 text-yellow-400"><ICONS.Star size={16} fill="currentColor" /> {movieDetails.vote_average.toFixed(1)}</span>
               </div>
               
-              <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
+              <div className="flex flex-wrap justify-center lg:justify-start gap-2 mb-8">
                 {movieDetails.genres.map(g => (
                   <span key={g.id} className="px-3 py-1 rounded-full border border-white/10 text-xs text-slate-300 bg-white/5 hover:bg-neon-blue/10 hover:border-neon-blue transition-colors cursor-default">
                     {g.name}
@@ -293,62 +302,68 @@ const App = () => {
                 ))}
               </div>
 
-              <p className="text-slate-300 text-lg leading-relaxed mb-8">{movieDetails.overview}</p>
+              <div className="bg-white/5 rounded-xl p-6 mb-8 backdrop-blur-sm border border-white/5 text-left">
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Synopsis</h3>
+                  <p className="text-slate-200 text-base md:text-lg leading-relaxed">{movieDetails.overview}</p>
+              </div>
 
-              <div className="flex justify-center md:justify-start gap-4 mb-12">
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-12">
                 <button 
                   onClick={() => toggleBookmark(movieDetails)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${bookmarks.some(b => b.id === movieDetails.id) ? 'bg-neon-purple text-white shadow-lg shadow-neon-purple/20' : 'glass-panel text-white hover:bg-white/20'}`}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all transform hover:scale-105 ${bookmarks.some(b => b.id === movieDetails.id) ? 'bg-neon-purple text-white shadow-lg shadow-neon-purple/20' : 'glass-panel text-white hover:bg-white/20'}`}
                 >
-                  <ICONS.Heart size={20} /> {bookmarks.some(b => b.id === movieDetails.id) ? 'Saved' : 'Bookmark'}
+                  <ICONS.Heart size={20} fill={bookmarks.some(b => b.id === movieDetails.id) ? "currentColor" : "none"} /> 
+                  {bookmarks.some(b => b.id === movieDetails.id) ? 'In Collection' : 'Add to Collection'}
                 </button>
                 <button 
                     onClick={() => toggleCompare(movieDetails)}
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold glass-panel text-white hover:bg-white/20 transition-all"
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold glass-panel text-white hover:bg-white/20 transition-all transform hover:scale-105"
                 >
                     <ICONS.Compare size={20} /> Compare
                 </button>
               </div>
               
-              {/* Cast */}
-              <div className="mb-12">
-                <h3 className="text-xl font-bold text-white mb-4">Top Cast</h3>
-                <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
+              {/* Cast - Horizontal Scroll Fix */}
+              <div className="mb-12 text-left">
+                <h3 className="text-xl font-bold text-white mb-4 border-l-4 border-neon-blue pl-3">Top Cast</h3>
+                <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-4 px-4 lg:mx-0 lg:px-0">
                   {movieDetails.credits.cast.slice(0, 10).map(actor => (
-                    <div key={actor.id} className="min-w-[100px] text-center group">
-                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden mb-2 mx-auto border-2 border-white/10 group-hover:border-neon-blue transition-colors">
+                    <div key={actor.id} className="min-w-[100px] md:min-w-[120px] text-center group flex-shrink-0">
+                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden mb-3 mx-auto border-2 border-white/10 group-hover:border-neon-blue transition-colors">
                         <img src={getImageUrl(actor.profile_path)} className="w-full h-full object-cover transition-transform group-hover:scale-110" alt={actor.name} />
                       </div>
-                      <p className="text-xs font-medium text-white truncate group-hover:text-neon-blue transition-colors">{actor.name}</p>
-                      <p className="text-[10px] text-slate-400 truncate">{actor.character}</p>
+                      <p className="text-xs md:text-sm font-medium text-white truncate px-1 group-hover:text-neon-blue transition-colors">{actor.name}</p>
+                      <p className="text-[10px] md:text-xs text-slate-400 truncate px-1">{actor.character}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 text-left">
                   <div className="p-4 glass-panel rounded-xl">
-                      <p className="text-slate-400 text-xs mb-1">Budget</p>
-                      <p className="text-white font-mono">${(movieDetails.budget / 1000000).toFixed(1)}M</p>
+                      <p className="text-slate-400 text-xs mb-1 uppercase tracking-wider">Budget</p>
+                      <p className="text-white font-mono font-medium">{movieDetails.budget > 0 ? `$${(movieDetails.budget / 1000000).toFixed(1)}M` : 'N/A'}</p>
                   </div>
                   <div className="p-4 glass-panel rounded-xl">
-                      <p className="text-slate-400 text-xs mb-1">Revenue</p>
-                      <p className="text-white font-mono">${(movieDetails.revenue / 1000000).toFixed(1)}M</p>
+                      <p className="text-slate-400 text-xs mb-1 uppercase tracking-wider">Revenue</p>
+                      <p className="text-white font-mono font-medium">{movieDetails.revenue > 0 ? `$${(movieDetails.revenue / 1000000).toFixed(1)}M` : 'N/A'}</p>
                   </div>
                   <div className="p-4 glass-panel rounded-xl">
-                      <p className="text-slate-400 text-xs mb-1">Status</p>
-                      <p className="text-white">{movieDetails.status}</p>
+                      <p className="text-slate-400 text-xs mb-1 uppercase tracking-wider">Status</p>
+                      <p className="text-white font-medium">{movieDetails.status}</p>
                   </div>
                    <div className="p-4 glass-panel rounded-xl">
-                      <p className="text-slate-400 text-xs mb-1">Original Lang</p>
-                      <p className="text-white uppercase">{movieDetails.original_language}</p>
+                      <p className="text-slate-400 text-xs mb-1 uppercase tracking-wider">Language</p>
+                      <p className="text-white uppercase font-medium">{movieDetails.original_language}</p>
                   </div>
               </div>
 
               {/* Similar */}
               {movieDetails.similar && movieDetails.similar.results.length > 0 && (
-                 renderSection("You might also like", movieDetails.similar.results)
+                 <div className="text-left">
+                    {renderSection("You might also like", movieDetails.similar.results)}
+                 </div>
               )}
             </div>
           </div>
@@ -358,13 +373,13 @@ const App = () => {
   };
 
   const renderGrid = (title: string, movies: Movie[]) => (
-    <div className="p-8 pt-24 min-h-screen animate-fade-in">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-white border-l-4 border-neon-blue px-4">{title}</h2>
+    <div className="p-4 md:p-8 pt-32 min-h-screen animate-fade-in bg-space-black">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-white border-l-4 border-neon-blue px-4">{title}</h2>
         {view === 'search' && (
-             <div className="flex gap-2">
+             <div className="flex gap-2 w-full md:w-auto">
                  <select 
-                    className="bg-space-dark text-white p-2 rounded border border-white/10 text-sm outline-none"
+                    className="bg-space-dark text-white p-2 rounded border border-white/10 text-sm outline-none w-full md:w-auto focus:border-neon-blue transition-colors"
                     value={filterState.sortBy}
                     onChange={(e) => {
                         setFilterState({...filterState, sortBy: e.target.value as any});
@@ -386,9 +401,12 @@ const App = () => {
              <p className="text-slate-500">Searching the cosmos...</p>
           </div>
       ) : movies.length === 0 ? (
-        <div className="text-center text-slate-500 py-20">No movies found. Try exploring different galaxies.</div>
+        <div className="text-center text-slate-500 py-20">
+            <p className="text-xl mb-2">No movies found</p>
+            <p className="text-sm">Try exploring different galaxies or adjusting your sensors.</p>
+        </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
             {movies.map(movie => (
             <div key={movie.id} className="h-full">
                 <MovieCard 
@@ -405,7 +423,7 @@ const App = () => {
   );
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0 relative">
+    <div className="min-h-screen bg-space-black text-white selection:bg-neon-blue selection:text-space-black font-sans">
       
       {/* Settings Modal (Force API Key) */}
       <Modal isOpen={showSettings} onClose={() => { if(apiKey) setShowSettings(false); }} title="Setup Mission Control">
@@ -431,32 +449,34 @@ const App = () => {
 
       {/* Compare Modal */}
       <Modal isOpen={showCompare} onClose={() => setShowCompare(false)} title="Compare Movies" fullScreen>
-          <div className="p-8 grid grid-cols-2 gap-8 h-full">
+          <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 h-full overflow-y-auto">
               {compareList.map(m => (
-                  <div key={m.id} className="flex flex-col gap-4 text-center animate-slide-up">
-                      <img src={getImageUrl(m.poster_path)} className="w-48 mx-auto rounded-lg shadow-xl" />
-                      <h3 className="text-2xl font-bold">{m.title}</h3>
-                      <div className="space-y-4 text-slate-300">
-                          <div className="p-2 bg-white/5 rounded">Rating: <span className="text-yellow-400 font-bold">{m.vote_average.toFixed(1)}</span></div>
-                          <div className="p-2 bg-white/5 rounded">Release: {m.release_date}</div>
-                          <div className="p-2 bg-white/5 rounded">Popularity: {Math.round(m.popularity)}</div>
-                          <div className="p-2 bg-white/5 rounded text-sm">{m.overview}</div>
+                  <div key={m.id} className="flex flex-col gap-4 text-center animate-slide-up bg-white/5 p-6 rounded-2xl border border-white/5">
+                      <img src={getImageUrl(m.poster_path)} className="w-32 md:w-48 mx-auto rounded-lg shadow-xl" />
+                      <h3 className="text-xl md:text-2xl font-bold">{m.title}</h3>
+                      <div className="space-y-4 text-slate-300 text-sm md:text-base">
+                          <div className="p-3 bg-space-black/50 rounded-lg flex justify-between"><span>Rating</span> <span className="text-yellow-400 font-bold">{m.vote_average.toFixed(1)}</span></div>
+                          <div className="p-3 bg-space-black/50 rounded-lg flex justify-between"><span>Release</span> <span>{m.release_date}</span></div>
+                          <div className="p-3 bg-space-black/50 rounded-lg flex justify-between"><span>Popularity</span> <span>{Math.round(m.popularity)}</span></div>
+                          <div className="p-3 bg-space-black/50 rounded-lg text-left leading-relaxed max-h-40 overflow-y-auto">{m.overview}</div>
                       </div>
-                      <button onClick={() => toggleCompare(m)} className="mt-auto bg-red-500/20 text-red-500 py-2 rounded hover:bg-red-500 hover:text-white transition-all">Remove</button>
+                      <button onClick={() => toggleCompare(m)} className="mt-auto bg-red-500/20 text-red-500 py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all font-medium">Remove</button>
                   </div>
               ))}
               {compareList.length < 2 && (
-                  <div className="flex items-center justify-center border-2 border-dashed border-white/10 rounded-xl">
-                      <p className="text-slate-500">Select another movie to compare</p>
+                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-xl p-8 text-center h-64 md:h-auto">
+                      <ICONS.Compare size={48} className="text-slate-600 mb-4" />
+                      <p className="text-slate-500 text-lg">Select another movie to compare</p>
+                      <p className="text-slate-600 text-sm mt-2">Navigate to any movie and click 'Compare'</p>
                   </div>
               )}
           </div>
       </Modal>
 
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-40 bg-space-black/80 backdrop-blur-lg border-b border-white/5 h-16 flex items-center px-4 md:px-8 justify-between transition-all duration-300">
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/5 h-16 flex items-center px-4 md:px-8 justify-between ${view === 'home' && !searchQuery ? 'bg-black/50 backdrop-blur-md' : 'bg-space-black/90 backdrop-blur-xl'}`}>
         <div className="flex items-center gap-2 cursor-pointer group" onClick={() => setView('home')}>
-          <div className="w-8 h-8 bg-gradient-to-tr from-neon-blue to-neon-purple rounded-lg flex items-center justify-center font-bold text-white group-hover:rotate-12 transition-transform">M</div>
+          <div className="w-8 h-8 bg-gradient-to-tr from-neon-blue to-neon-purple rounded-lg flex items-center justify-center font-bold text-white group-hover:rotate-12 transition-transform shadow-lg shadow-neon-blue/20">M</div>
           <span className="font-bold text-xl tracking-tight hidden md:block">Movie<span className="text-neon-blue">Space</span></span>
         </div>
 
@@ -467,49 +487,49 @@ const App = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch(searchQuery)}
-            placeholder="Search for movies, stars, or genres..."
-            className="w-full bg-space-dark border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-neon-blue outline-none transition-all focus:ring-1 focus:ring-neon-blue/50"
+            placeholder="Search movies..."
+            className="w-full bg-space-dark/50 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:border-neon-blue outline-none transition-all focus:ring-1 focus:ring-neon-blue/50 focus:bg-space-dark"
           />
         </div>
 
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-1 md:gap-3">
           <button 
              onClick={handleRandomDiscovery}
              title="Discover Random"
-             className="p-2 hover:text-neon-blue transition-colors hidden md:block hover:rotate-180 duration-500"
+             className="p-2 hover:text-neon-blue transition-colors hidden md:block hover:bg-white/5 rounded-full"
           >
               <ICONS.Shuffle size={20} />
           </button>
           
           <button 
             onClick={() => setView('bookmarks')}
-            className="p-2 hover:text-neon-purple transition-colors relative"
+            className="p-2 hover:text-neon-purple transition-colors relative hover:bg-white/5 rounded-full"
           >
             <ICONS.Heart size={20} fill={view === 'bookmarks' ? "currentColor" : "none"} />
-            {bookmarks.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-neon-purple rounded-full animate-bounce"></span>}
+            {bookmarks.length > 0 && <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-neon-purple rounded-full animate-pulse"></span>}
           </button>
           
-          <button onClick={() => setView('history')} className="p-2 hover:text-neon-blue transition-colors hidden md:block">
+          <button onClick={() => setView('history')} className="p-2 hover:text-neon-blue transition-colors hidden md:block hover:bg-white/5 rounded-full">
             <ICONS.History size={20} />
           </button>
 
           {compareList.length > 0 && (
-               <button onClick={() => setShowCompare(true)} className="p-2 text-neon-blue relative hover:scale-110 transition-transform">
+               <button onClick={() => setShowCompare(true)} className="p-2 text-neon-blue relative hover:scale-110 transition-transform hover:bg-white/5 rounded-full">
                    <ICONS.Compare size={20} />
                    <span className="absolute -top-1 -right-1 bg-neon-blue text-space-black text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{compareList.length}</span>
                </button>
           )}
 
-          <button onClick={() => setShowSettings(true)} className="p-2 hover:text-white text-slate-400 transition-colors">
+          <button onClick={() => setShowSettings(true)} className="p-2 hover:text-white text-slate-400 transition-colors hover:bg-white/5 rounded-full">
             <ICONS.Settings size={20} />
           </button>
         </div>
       </nav>
 
       {/* Main Content */}
-      <main className="pt-16 min-h-screen">
+      <main className="pt-0 min-h-screen">
         {view === 'home' && (
-          <div className="animate-fade-in">
+          <div className="animate-fade-in pb-12">
              {!apiKey ? (
                  <div className="h-screen flex flex-col items-center justify-center p-4 text-center">
                      <h2 className="text-2xl font-bold mb-2">Welcome to Movie Space</h2>
@@ -526,16 +546,18 @@ const App = () => {
                     ) : (
                         <>
                             {renderHero()}
-                            {renderSection("Trending This Week", trending)}
-                            {renderSection("Top Rated Worldwide", topRated)}
-                            {renderSection("Popular Thrillers", popularThriller)}
-                            {renderSection("IMDb 8+ Rated", highRated)}
-                            {renderSection("Popular Hindi Movies", popularHindi)}
-                            {renderSection("Popular Anime", popularAnime)}
+                            <div className="space-y-8">
+                                {renderSection("Trending This Week", trending)}
+                                {renderSection("Top Rated Worldwide", topRated)}
+                                {renderSection("Popular Thrillers", popularThriller)}
+                                {renderSection("IMDb 8+ Rated", highRated)}
+                                {renderSection("Popular Hindi Movies", popularHindi)}
+                                {renderSection("Popular Anime", popularAnime)}
+                            </div>
                             
                             {/* Categories Chips */}
-                            <div className="px-8 mb-12 animate-slide-up">
-                                <h2 className="text-2xl font-bold mb-4">Explore Genres</h2>
+                            <div className="px-4 md:px-8 mb-20 animate-slide-up">
+                                <h2 className="text-xl md:text-2xl font-bold mb-6">Explore by Genre</h2>
                                 <div className="flex flex-wrap gap-3">
                                     {GENRES.map(genre => (
                                         <button 

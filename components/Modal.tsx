@@ -22,7 +22,7 @@ const Modal: React.FC<Props> = ({ isOpen, onClose, children, title, fullScreen =
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
       <div 
         className={`bg-space-dark border border-white/10 w-full ${fullScreen ? 'h-[95vh] max-w-6xl' : 'max-w-2xl max-h-[90vh]'} rounded-2xl overflow-hidden flex flex-col shadow-2xl relative animate-slide-up`}
       >
