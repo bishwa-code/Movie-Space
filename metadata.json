@@ -1,0 +1,5 @@
+{
+  "name": "Movie Space",
+  "description": "A futuristic, frontend-only movie discovery platform powered by the TMDB API. Features include detailed filtering, local bookmarking, history tracking, and an immersive UI.",
+  "requestFramePermissions": []
+}
